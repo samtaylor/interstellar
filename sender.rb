@@ -9,13 +9,17 @@ CONFIG = YAML.load_file('./secrets/secrets.yml')
 date = Date.today-2
 
 file_date = date.strftime("%Y%m")
-csv_file_name = "#{CONFIG["package_name"]}_#{file_date}.csv"
-
+csv_file_name = "reviews_#{CONFIG["package_name"]}_#{file_date}.csv"
+puts "fileName: #{csv_file_name}"
 system "BOTO_PATH=./secrets/.boto gsutil/gsutil cp -r gs://#{CONFIG["app_repo"]}/reviews/#{csv_file_name} ."
-
+system "BOTO_PATH=./secrets/.boto gsutil/gsutil cp gs://play_public/supported_devices.csv ."
 
 class Slack
   def self.notify(message)
+    if CONFIG["proxy"]
+      RestClient.proxy = CONFIG["proxy"]
+      puts "Proxying!"
+    end
     RestClient.post CONFIG["slack_url"], {
       payload:
       { text: message }.to_json
@@ -41,6 +45,7 @@ class Review
 
 
     if message != ""
+      #puts message
       Slack.notify(message)
     else
       print "No new reviews\n"
@@ -57,7 +62,7 @@ class Review
     @original_subitted_at = DateTime.parse(data[:original_subitted_at].encode("utf-8"))
 
     @rate = data[:rate].encode("utf-8").to_i
-    @device = data[:device] ? data[:device].to_s.encode("utf-8") : nil
+    @device = data[:device] ? data[:device].to_s.encode("utf-8") : "Unavailable"
     @url = data[:url].to_s.encode("utf-8")
     @version = data[:version].to_s.encode("utf-8")
     @edited = data[:edited]
@@ -65,7 +70,7 @@ class Review
 
   def notify_to_slack
     if text || title
-      message = "*Rating: #{rate}* | version: #{version} | subdate: #{submitted_at}\n #{[title, text].join(" ")}\n <#{url}|Ответить в Google play>"
+      message = "*Rating: #{rate}* | version: #{version} | subdate: #{submitted_at}\n #{[title, text].join(" ")}\n <#{url}|Google Play Reviews>"
       Slack.notify(message)
     end
   end
@@ -79,13 +84,29 @@ class Review
 
     stars = rate.times.map{"★"}.join + (5 - rate).times.map{"☆"}.join
 
+    marketingName = find_marketing_name(device)
+
     [
       "\n\n#{stars}",
-      "Version: #{version} | #{date}",
+      "Version: #{version} | #{date} | Device: #{device} - #{marketingName}",
       "#{[title, text].join(" ")}",
-      "<#{url}|Ответить в Google play>"
+      "<#{url}|Google Play Reviews>"
     ].join("\n")
   end
+end
+
+def find_marketing_name(device)
+  CSV.foreach("supported_devices.csv", encoding: 'bom|utf-16le', headers: true) do | row |
+
+  row0 = row[0].nil? ? "Unavailable" : row[0].force_encoding('utf-16le').encode('utf-8')
+  row1 = row[1].nil? ? "Unavailable" : row[1].force_encoding('utf-16le').encode('utf-8')
+  row2 = row[2].nil? ? "Unavailable" : row[2].force_encoding('utf-16le').encode('utf-8')
+	
+  if device.casecmp(row2) == 0
+    return row0 + " " + row1
+    end
+
+end
 end
 
 CSV.foreach(csv_file_name, encoding: 'bom|utf-16le', headers: true) do |row|
