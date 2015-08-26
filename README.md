@@ -40,6 +40,7 @@ It is intended to be fired once a day via cron.
 1. Run `gsutil/gsutil config` and follow the steps.
 2. Once done, there will be a .boto file in your home dir.
 3. Copy this file to the ./secrets folder and you are good to go.
+4. If using a proxy update the proxy values in secrets/.boto
 
 You can always get the latest gsutil(https://cloud.google.com/storage/docs/gsutil_install) and change this line
 `system “BOTO_PATH=./secrets/.boto gsutil/gsutil cp -r gs://#{CONFIG[“app_repo”]}/reviews/#{csv_file_name} .”`
