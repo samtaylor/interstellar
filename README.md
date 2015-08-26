@@ -19,7 +19,7 @@ Plus, you want a good rating in the Google Play Store, right?
 ## How it works
 Google Play [exports](https://support.google.com/googleplay/android-developer/answer/138230) all your app reviews once a day to the [Google Cloud Storage](https://cloud.google.com/storage/docs) bucket.
 
-_Interstellar_ downloads reviews via google-provided [gsutil](https://cloud.google.com/storage/docs/gsutil) tool and triggers [Slack incoming webhook](https://api.slack.com/incoming-webhooks) for all new or updated reviews.
+_Interstellar_ downloads reviews via google-provided [gsutil](https://cloud.google.com/storage/docs/gsutil) tool and triggers [Slack incoming webhook](https://api.slack.com/incoming-webhooks) for all new or updated reviews. This fork includes a the decoded manufacturing name derived from the device id.
 
 It is intended to be fired once a day via cron.
 
