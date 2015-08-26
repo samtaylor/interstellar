@@ -17,7 +17,6 @@ class Slack
   def self.notify(message)
     if CONFIG["proxy"]
       RestClient.proxy = CONFIG["proxy"]
-      puts "Proxying!"
     end
     RestClient.post CONFIG["slack_url"], {
       payload:
@@ -44,7 +43,6 @@ class Review
 
 
     if message != ""
-      #puts message
       Slack.notify(message)
     else
       print "No new reviews\n"
