@@ -94,26 +94,30 @@ end
 
 def find_marketing_name(device)
 
-
-  retailBrandAndMarketingName = ""
+  retailBrands = Array.new
+  marketingNames = Array.new
   models = Array.new
 
   CSV.foreach("supported_devices.csv", encoding: 'bom|utf-16le', headers: true) do | column |
 
-  #Retail Branding,Marketing Name,Device,Model
-  retailBranding = column[0].nil? ? "Unavailable" : column[0].force_encoding('utf-16le').encode('utf-8')
-  marketingName = column[1].nil? ? "Unavailable" : column[1].force_encoding('utf-16le').encode('utf-8')
-  playDevice = column[2].nil? ? "Unavailable" : column[2].force_encoding('utf-16le').encode('utf-8')
-  model = column[3].nil? ? "Unavailable" : column[3].force_encoding('utf-16le').encode('utf-8')
+      retailBranding = column[0].nil? ? "Unavailable" : column[0].force_encoding('utf-16le').encode('utf-8')
+      marketingName = column[1].nil? ? "Unavailable" : column[1].force_encoding('utf-16le').encode('utf-8')
+      playDevice = column[2].nil? ? "Unavailable" : column[2].force_encoding('utf-16le').encode('utf-8')
+      model = column[3].nil? ? "Unavailable" : column[3].force_encoding('utf-16le').encode('utf-8')
 
-  if device.casecmp(playDevice) == 0
-    retailBrandAndMarketingName = retailBranding + " " + marketingName
-    models.push(model)
-    end
+      if device.casecmp(playDevice) == 0
+        if !(retailBrands.any?{ |s| s.casecmp(retailBranding)==0})
+          retailBrands.push(retailBranding)
+        end
+        if !(marketingNames.any?{ |s| s.casecmp(marketingName)==0})
+          marketingNames.push(marketingName)
+        end
+        models.push(model)
+      end
 
-end
+  end
 
-  return retailBrandAndMarketingName + " - " + models.join("/")
+  return retailBrands.join("/") + " - " + marketingNames.join("/") + " - " + models.join("/")
 end
 
 CSV.foreach(csv_file_name, encoding: 'bom|utf-16le', headers: true) do |row|
