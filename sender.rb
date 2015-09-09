@@ -85,7 +85,8 @@ class Review
 
     [
       "\n\n#{stars}",
-      "Version: #{version} | #{date} | Device: #{device} - #{marketingName}",
+      "Version: #{version} | #{date} ",
+      "*Device:* #{device}  #{marketingName}",
       "#{[title, text].join(" ")}",
       "<#{url}|Google Play Reviews>"
     ].join("\n")
@@ -117,7 +118,7 @@ def find_marketing_name(device)
 
   end
 
-  return retailBrands.join("/") + " - " + marketingNames.join("/") + " - " + models.join("/")
+  return "\n*Brand:* " + retailBrands.join("/") + "\n*Marketing Names:* " + marketingNames.join("/") + "\n*Models:* " + models.join("/") + "\n"
 end
 
 CSV.foreach(csv_file_name, encoding: 'bom|utf-16le', headers: true) do |row|
