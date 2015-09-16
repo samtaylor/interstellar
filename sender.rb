@@ -99,12 +99,12 @@ def find_marketing_name(device)
   marketingNames = Array.new
   models = Array.new
 
-  CSV.foreach("supported_devices.csv", encoding: 'bom|utf-16le', headers: true) do | column |
+  CSV.foreach("supported_devices.csv", encoding: 'bom|utf-16le', headers: true) do | row |
 
-      retailBranding = column[0].nil? ? "Unavailable" : column[0].force_encoding('utf-16le').encode('utf-8')
-      marketingName = column[1].nil? ? "Unavailable" : column[1].force_encoding('utf-16le').encode('utf-8')
-      playDevice = column[2].nil? ? "Unavailable" : column[2].force_encoding('utf-16le').encode('utf-8')
-      model = column[3].nil? ? "Unavailable" : column[3].force_encoding('utf-16le').encode('utf-8')
+      retailBranding = row[0].nil? ? "Unavailable" : row[0].force_encoding('utf-16le').encode('utf-8')
+      marketingName = row[1].nil? ? "Unavailable" : row[1].force_encoding('utf-16le').encode('utf-8')
+      playDevice = row[2].nil? ? "Unavailable" : row[2].force_encoding('utf-16le').encode('utf-8')
+      model = row[3].nil? ? "Unavailable" : row[3].force_encoding('utf-16le').encode('utf-8')
 
       if device.casecmp(playDevice) == 0
         if !(retailBrands.any?{ |s| s.casecmp(retailBranding)==0})
